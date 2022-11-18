@@ -21,9 +21,11 @@ function [FPR,TPR] = plotROC(x,labels,p,w,m01,C01,m02,C02,m1,C1)
     theo_TPR = sum(theo_decision==1 & labels==1)/length(find(labels==1));
     theo_error = theo_FPR*p(1)+(1-theo_TPR)*p(2);
     figure;
-    plot(FPR,TPR,'-',min_FPR,min_TPR,'o',theo_FPR,theo_TPR,'g+');
+    plot(FPR,TPR);
+    %plot(FPR,TPR,'-',min_FPR,min_TPR,'o',theo_FPR,theo_TPR,'g+');
     title('ROC Curve');
-    legend('ROC Curve','Calculated Min Error','Theoretical Min Error');
+    %legend('ROC Curve','Calculated Min Error','Theoretical Min Error');
+    legend('ROC Curve')
     xlabel('FPR');
     ylabel('TPR');
 end
