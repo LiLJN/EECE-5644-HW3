@@ -1,0 +1,106 @@
+%% Question 1 Setup %%
+clear all;
+close all;
+clc;
+n = 2; %Dimensions of data
+N100 = 100;
+N1000 = 1000;
+N10000 = 10000;
+N20000 = 20000; %Number of data samples
+p0 = 0.6; %Prior for label 0
+p1 = 0.4; %Prior for label 1
+w1 = 0.5; %Weight for label 0 condition 1
+w2 = 0.5; %Weight for label 0 condition 2
+u1 = rand(1,N100) >= p0; %Determine posteriors
+u2 = rand(1,N1000) >= p0;
+u3 = rand(1,N10000) >= p0;
+u4 = rand(1,N20000) >= p0;
+%Create appropriate number of data points from each distribution
+N00 = length(find(u1==0));
+N01 = length(find(u1==1));
+N10 = length(find(u2==0));
+N11 = length(find(u2==1));
+N20 = length(find(u3==0));
+N21 = length(find(u3==1));
+N30 = length(find(u4==0));
+N31 = length(find(u4==1));
+N0 = N00+N01;
+N1 = N10+N11;
+N2 = N20+N21;
+N3 = N30+N31;
+label0 = [zeros(1,N00) ones(1,N01)];
+label1 = [zeros(1,N10) ones(1,N11)];
+label2 = [zeros(1,N20) ones(1,N21)];
+label3 = [zeros(1,N30) ones(1,N31)];
+
+%Parameters for two classes
+m01 = [5;0]; C01 = [4,0;0,2];
+m02 = [0;4]; C02 = [1,0;0,3];
+m1 = [3;2]; C1 = [2,0;0,2];
+%Data generation with requirement
+gmmParameters.priors = [w1,w2];
+gmmParameters.meanVectors = [m01,m02];
+gmmParameters.covMatrices(:,:,1) = C01;
+gmmParameters.covMatrices(:,:,2) = C02;
+[r00,P00_label] = generateDataFromGMM(N00,gmmParameters);
+[r10,P10_label] = generateDataFromGMM(N10,gmmParameters);
+[r20,P20_label] = generateDataFromGMM(N20,gmmParameters);
+[r30,P30_label] = generateDataFromGMM(N30,gmmParameters);
+r01 = mvnrnd(m1,C1,N01)';
+r11 = mvnrnd(m1,C1,N11)';
+r21 = mvnrnd(m1,C1,N21)';
+r31 = mvnrnd(m1,C1,N31)';
+%Combine data into a single dataset
+x0 = zeros(n,N0);
+x1 = zeros(n,N1);
+x2 = zeros(n,N2);
+x3 = zeros(n,N3);
+x0(:,label0==0) = r00;
+x0(:,label0==1) = r01;
+x1(:,label1==0) = r10;
+x1(:,label1==1) = r11;
+x2(:,label2==0) = r20;
+x2(:,label2==1) = r21;
+x3(:,label3==0) = r30;
+x3(:,label3==1) = r31;
+
+%Plot data showing two classes    
+figure(1);
+plot(r00(1,:),r00(2,:),'.');
+axis equal;
+hold on;
+plot(r01(1,:),r01(2,:),'.');
+title('Class 0 and Class 1 True Class Labels for 100 samples')
+xlabel('x')
+ylabel('y')
+legend('Class 0','Class 1')
+
+figure(2);
+plot(r10(1,:),r10(2,:),'.');
+axis equal;
+hold on;
+plot(r11(1,:),r11(2,:),'.');
+title('Class 0 and Class 1 True Class Labels for 1000 samples')
+xlabel('x')
+ylabel('y')
+legend('$p(\mathbf{x}|L=0)$','interpreter','latex')
+
+figure(3);
+plot(r20(1,:),r20(2,:),'.');
+axis equal;
+hold on;
+plot(r21(1,:),r21(2,:),'.');
+title('Class 0 and Class 1 True Class Labels for 10000 samples')
+xlabel('x')
+ylabel('y')
+legend('Class 0','Class 1')
+
+figure(4);
+plot(r30(1,:),r30(2,:),'.');
+axis equal;
+hold on;
+plot(r31(1,:),r31(2,:),'.');
+title('Class 0 and Class 1 True Class Labels for 20000 samples')
+xlabel('x')
+ylabel('y')
+legend('Class 0','Class 1')
